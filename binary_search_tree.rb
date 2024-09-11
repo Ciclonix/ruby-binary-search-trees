@@ -35,6 +35,31 @@ class Tree
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
     pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
   end
+
+  def insert(data)
+    if @root.nil?
+      @root = Node.new(data)
+      return
+    end
+
+    compare(@root, Node.new(data))
+  end
+
+  def compare(node, new_node)
+    if new_node > node
+      if node.right.nil?
+        node.right = new_node
+      else
+        compare(node.right, new_node)
+      end
+    elsif new_node < node
+      if node.left.nil?
+        node.left = new_node
+      else
+        compare(node.left, new_node)
+      end
+    end
+  end
 end
 
 a = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
