@@ -32,6 +32,8 @@ class Tree
   end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
+    return if node.nil?
+
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) unless node.right.nil?
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
     pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) unless node.left.nil?
@@ -107,31 +109,68 @@ class Tree
     end
   end
 
-  def level_order
-    return [] if @root.nil?
-
-    values = getValues
-    return values.map { |x| x.data } unless block_given?
-
-    values.each { |x| yield x }
+  def level_order(&block)
+    return block_given? ? traversalChoice(0, &block) : traversalChoice(0)
   end
 
-  def getValues
-    level_node_list = [@root]
-    values = []
+  def inorder(&block)
+    return block_given? ? traversalChoice(1, &block) : traversalChoice(1)
+  end
 
-    loop do
-      break if level_node_list.empty?
+  def preorder(&block)
+    return block_given? ? traversalChoice(2, &block) : traversalChoice(2)
+  end
 
-      temp = []
-      level_node_list.each do |node|
-        values << node
-        temp << node.left
-        temp << node.right
-      end
-      temp.compact!
-      level_node_list = temp
+  def postorder(&block)
+    return block_given? ? traversalChoice(3, &block) : traversalChoice(3)
+  end
+
+  def traversalChoice(type) # 0 = level_order, 1 = inorder, 2 = preorder, 3 = postorder
+    return [] if @root.nil?
+
+    node_list = []
+    case type
+    when 0
+      levelOrderTraversal(node_list, [@root])
+    when 1
+      inorderTraversal(node_list, @root)
+    when 2
+      preorderTraversal(node_list, @root)
+    when 3
+      postorderTraversal(node_list, @root)
     end
-    return values
+    return node_list.map { |x| x.data } unless block_given?
+
+    node_list.each { |x| yield x }
+  end
+
+  def levelOrderTraversal(node_list, level_node_list)
+    return if level_node_list.empty?
+
+    temp = []
+    level_node_list.each do |node|
+      node_list << node
+      temp << node.left << node.right
+    end
+    temp.compact!
+    levelOrderTraversal(node_list, temp)
+  end
+
+  def inorderTraversal(node_list, node)
+    inorderTraversal(node_list, node.left) unless node.left.nil?
+    node_list << node
+    inorderTraversal(node_list, node.right) unless node.right.nil?
+  end
+
+  def preorderTraversal(node_list, node)
+    node_list << node
+    preorderTraversal(node_list, node.left) unless node.left.nil?
+    preorderTraversal(node_list, node.right) unless node.right.nil?
+  end
+
+  def postorderTraversal(node_list, node)
+    postorderTraversal(node_list, node.left) unless node.left.nil?
+    postorderTraversal(node_list, node.right) unless node.right.nil?
+    node_list << node
   end
 end
