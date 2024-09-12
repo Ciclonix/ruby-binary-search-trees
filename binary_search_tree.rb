@@ -19,8 +19,9 @@ class Tree
   attr_accessor :root
 
   def initialize(arr)
-    arr.uniq!.sort!
+    arr.sort!.uniq!
     @root = build_tree(arr)
+    @i = 0
   end
 
   def build_tree(arr)
@@ -31,9 +32,9 @@ class Tree
   end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
-    pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
+    pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) unless node.right.nil?
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
-    pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
+    pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) unless node.left.nil?
   end
 
   def insert(data)
@@ -60,7 +61,49 @@ class Tree
       end
     end
   end
-end
 
-a = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
-a.pretty_print
+  def delete(data)
+    removeNode(@root, data)
+  end
+
+  def removeNode(this_node, data)
+    return this_node if this_node.nil?
+
+    if this_node.data > data
+      this_node.left = removeNode(this_node.left, data)
+    elsif this_node.data < data
+      this_node.right = removeNode(this_node.right, data)
+    else
+      return this_node.right if this_node.left.nil?
+      return this_node.left if this_node.right.nil?
+
+      successor = getSuccessor(this_node)
+      this_node.data = successor.data
+      this_node.right = removeNode(this_node.right, successor.data)
+    end
+    return this_node
+  end
+
+  def getSuccessor(node)
+    successor = node.right
+    until successor.nil? || successor.left.nil?
+      successor = successor.left
+    end
+    return successor
+  end
+
+  def find(data)
+    return if data.nil?
+
+    node = @root
+    loop do
+      return node if node.nil? || data == node.data
+
+      if data > node.data
+        node = node.right
+      else
+        node = node.left
+      end
+    end
+  end
+end
