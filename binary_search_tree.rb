@@ -106,4 +106,32 @@ class Tree
       end
     end
   end
+
+  def level_order
+    return [] if @root.nil?
+
+    values = getValues
+    return values.map { |x| x.data } unless block_given?
+
+    values.each { |x| yield x }
+  end
+
+  def getValues
+    level_node_list = [@root]
+    values = []
+
+    loop do
+      break if level_node_list.empty?
+
+      temp = []
+      level_node_list.each do |node|
+        values << node
+        temp << node.left
+        temp << node.right
+      end
+      temp.compact!
+      level_node_list = temp
+    end
+    return values
+  end
 end
