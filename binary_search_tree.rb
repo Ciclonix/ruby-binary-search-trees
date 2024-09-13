@@ -95,8 +95,6 @@ class Tree
   end
 
   def find(data)
-    return if data.nil?
-
     node = @root
     loop do
       return node if node.nil? || data == node.data
@@ -172,5 +170,37 @@ class Tree
     postorderTraversal(node_list, node.left) unless node.left.nil?
     postorderTraversal(node_list, node.right) unless node.right.nil?
     node_list << node
+  end
+
+  def height(node)
+    node = find(node.data)
+    return if node.nil?
+    return 0 if node.left.nil? && node.right.nil?
+
+    left = node.left.nil? ? 0 : height(node.left)
+    right = node.right.nil? ? 0 : height(node.right)
+    
+    return 1 +  if left > right
+                  left
+                else
+                  right
+                end
+  end
+
+  def depth(node)
+    depth = 0
+    curr_node = @root
+
+    loop do
+      return if curr_node.nil?
+      return depth if node == curr_node
+
+      if node > curr_node
+        curr_node = curr_node.right
+      else
+        curr_node = curr_node.left
+      end
+      depth += 1
+    end
   end
 end
