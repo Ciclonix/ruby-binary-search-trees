@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Node
   include Comparable
 
@@ -28,7 +30,7 @@ class Tree
     return if arr.empty?
 
     middle_idx = arr.length / 2
-    return Node.new(arr[middle_idx], build_tree(arr[0...middle_idx]), build_tree(arr[(middle_idx + 1)..-1]))
+    return Node.new(arr[middle_idx], build_tree(arr[0...middle_idx]), build_tree(arr[(middle_idx + 1)..]))
   end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
@@ -88,9 +90,7 @@ class Tree
 
   def getSuccessor(node)
     successor = node.right
-    until successor.nil? || successor.left.nil?
-      successor = successor.left
-    end
+    successor = successor.left until successor.nil? || successor.left.nil?
     return successor
   end
 
@@ -99,11 +99,11 @@ class Tree
     loop do
       return node if node.nil? || data == node.data
 
-      if data > node.data
-        node = node.right
-      else
-        node = node.left
-      end
+      node = if data > node.data
+               node.right
+             else
+               node.left
+             end
     end
   end
 
@@ -137,7 +137,7 @@ class Tree
     when 3
       postorderTraversal(node_list, @root)
     end
-    return node_list.map { |x| x.data } unless block_given?
+    return node_list.map(&:data) unless block_given?
 
     node_list.each { |x| yield x }
   end
@@ -183,12 +183,12 @@ class Tree
 
     left = node.left.nil? ? 0 : calculateHeight(node.left)
     right = node.right.nil? ? 0 : calculateHeight(node.right)
-    
-    return 1 +  if left > right
-                  left
-                else
-                  right
-                end
+
+    return 1 + if left > right
+                 left
+               else
+                 right
+               end
   end
 
   def depth(node)
@@ -199,11 +199,11 @@ class Tree
       return if curr_node.nil?
       return depth if node == curr_node
 
-      if node > curr_node
-        curr_node = curr_node.right
-      else
-        curr_node = curr_node.left
-      end
+      curr_node = if node > curr_node
+                    curr_node.right
+                  else
+                    curr_node.left
+                  end
       depth += 1
     end
   end
@@ -213,9 +213,7 @@ class Tree
     node_list.each do |node|
       left = node.left.nil? ? 0 : height(node.left)
       right = node.right.nil? ? 0 : height(node.right)
-      if left > right + 1 || left < right - 1
-        return false
-      end
+      return false if left > right + 1 || left < right - 1
     end
 
     return true
