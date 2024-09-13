@@ -174,11 +174,15 @@ class Tree
 
   def height(node)
     node = find(node.data)
+    return calculateHeight(node)
+  end
+
+  def calculateHeight(node)
     return if node.nil?
     return 0 if node.left.nil? && node.right.nil?
 
-    left = node.left.nil? ? 0 : height(node.left)
-    right = node.right.nil? ? 0 : height(node.right)
+    left = node.left.nil? ? 0 : calculateHeight(node.left)
+    right = node.right.nil? ? 0 : calculateHeight(node.right)
     
     return 1 +  if left > right
                   left
@@ -202,5 +206,23 @@ class Tree
       end
       depth += 1
     end
+  end
+
+  def balanced?
+    node_list = level_order { |node| }
+    node_list.each do |node|
+      left = node.left.nil? ? 0 : height(node.left)
+      right = node.right.nil? ? 0 : height(node.right)
+      if left > right + 1 || left < right - 1
+        return false
+      end
+    end
+
+    return true
+  end
+
+  def rebalance
+    arr = inorder
+    @root = build_tree(arr)
   end
 end
